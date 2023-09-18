@@ -33,7 +33,7 @@ public class Connect_PacketHandler : Singleton<Connect_PacketHandler>
             {0, _sceneFunctions}
         };
         
-        NetworkManager.Instance.OnReceiveDataFromServer += ExecuteActionByPacket;
+        NetworkManager.Instance.OnReceiveDataFromServer = ExecuteActionByPacket;
     }
 
     public void ExecuteActionByPacket(string clientName, string characteristic, byte[] bytes)
