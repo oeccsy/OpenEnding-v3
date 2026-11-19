@@ -26,11 +26,7 @@ namespace Oeccsy.StrokeMotion
 
         private void Awake()
         {
-            mesh = new Mesh();
-            mesh.MarkDynamic();
-
-            MeshFilter meshFilter = GetComponent<MeshFilter>();
-            meshFilter.sharedMesh = mesh;
+            EnsureMesh();
         }
 
         private void OnDestroy()
@@ -40,6 +36,7 @@ namespace Oeccsy.StrokeMotion
 
         public void BuildMesh(IReadOnlyList<TrimmedStroke> strokes)
         {
+            EnsureMesh();
             ClearBuffers();
             
             foreach (TrimmedStroke stroke in strokes)
@@ -51,6 +48,17 @@ namespace Oeccsy.StrokeMotion
             }
 
             ApplyToMesh();
+        }
+
+        private void EnsureMesh()
+        {
+           if (mesh != null) return;
+
+            mesh = new Mesh();
+            mesh.MarkDynamic();
+
+            MeshFilter meshFilter = GetComponent<MeshFilter>();
+            meshFilter.sharedMesh = mesh;
         }
 
         private void ClearBuffers()
