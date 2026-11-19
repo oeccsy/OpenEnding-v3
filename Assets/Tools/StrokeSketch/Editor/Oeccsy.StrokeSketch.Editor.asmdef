@@ -1,0 +1,19 @@
+{
+    "name": "Oeccsy.StrokeSketch.Editor",
+    "rootNamespace": "Oeccsy.StrokeSketch",
+    "references": [
+        "Oeccsy.StrokeSketch",
+        "Oeccsy.StrokeMotion"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

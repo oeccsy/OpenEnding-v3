@@ -1,0 +1,19 @@
+{
+    "name": "Oeccsy.StrokeSketch.App",
+    "rootNamespace": "Oeccsy.StrokeSketch",
+    "references": [
+        "Oeccsy.StrokeSketch",
+        "Oeccsy.StrokeMotion",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
