@@ -4,40 +4,40 @@ using UnityEngine;
 namespace Oeccsy.StrokeSketch
 {
     /// <summary>
-    /// StrokeSketch에서 바꿀 수 있는 값을 한곳에 모은 구조체.
-    /// 캔버스, 펜, 정리 단계별 파라미터를 담는다. 사람은 UI로, AI는 요청으로 이 값을 바꾼다.
+    /// 그림 제작에 사용하는 조절값을 모은 설정.
+    /// 캔버스 크기와 펜 속성, 각 처리 단계의 기준값을 하나의 구조체로 관리한다.
     /// </summary>
     [Serializable]
     public struct SketchSettings
     {
-        // 캔버스 : 그림 좌표로 잰 크기
+        // 캔버스 크기(그림 좌표 단위).
         public Vector2 canvasSize;
 
-        // 펜 : 다음에 그리는 획부터 적용된다
+        // 획이 끝나 다듬을 때 적용한다.
         public Color penColor;
         public float penWidth;
 
-        // ② 리샘플링 : 점 사이 목표 간격 (그림 좌표). 구현에 따라 실제 간격은 조금 달라질 수 있다
+        // 목표 간격(그림 좌표 단위). 실제 간격은 구현체에 따라 다르다.
         public float targetSpacing;
 
-        // ③ 모서리 판단 : 꺾임 각도 기준(도, 181이면 끔)과 속도 기준(중앙값 대비 비율)
+        // 꺾임 각도(도, 180 초과이면 끔)와 획 속도 중앙값 대비 비율.
         public float cornerAngle;
         public float cornerSpeedRatio;
 
-        // ④ 손떨림 보정 : 이동 평균 반경 (점 개수, 0이면 끔)
+        // 이동 평균 반경(점 개수, 0이면 끔).
         public int smoothingRadius;
 
-        // ⑤ 곡선 피팅 : 곡선이 점에서 벗어나도 되는 거리 (그림 좌표)
+        // 피팅 허용 오차(그림 좌표 단위).
         public float tolerance;
 
         public static SketchSettings Default => new SketchSettings
         {
             canvasSize = new Vector2(1920f, 1080f),
             penColor = Color.black,
-            penWidth = 4f,
+            penWidth = 20f,
             targetSpacing = 4f,
             cornerAngle = 60f,
-            cornerSpeedRatio = 0.5f,
+            cornerSpeedRatio = 0.4f,
             smoothingRadius = 3,
             tolerance = 4f,
         };

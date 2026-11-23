@@ -4,8 +4,8 @@ using Oeccsy.StrokeMotion;
 namespace Oeccsy.StrokeSketch
 {
     /// <summary>
-    /// 손으로 그린 획을 3차 베지어 곡선으로 정리해 그림 데이터로 남기는 클래스.
-    /// 입력이 획 하나를 끝낼 때마다 그 획을 읽어 리샘플링, 모서리 판단, 손떨림 보정, 곡선 피팅 순서로 정리해 그림에 더한다.
+    /// 입력된 획을 다듬어 그림으로 쌓는 파이프라인.
+    /// 리샘플링부터 곡선 피팅까지 순서대로 연결하고, 모은 획을 내보낸다.
     /// </summary>
     public class StrokeSketcher
     {
@@ -18,7 +18,6 @@ namespace Oeccsy.StrokeSketch
 
         private readonly List<Stroke> strokes = new List<Stroke>();
 
-        // 입력 방식은 환경마다 달라서 각각의 환경에서 넣어 준다
         public StrokeSketcher(IStrokeInputHandler strokeInputHandler, SketchSettings settings)
         {
             this.strokeInputHandler = strokeInputHandler;
@@ -28,7 +27,6 @@ namespace Oeccsy.StrokeSketch
         public SketchSettings Settings { get; set; }
         public IReadOnlyList<Stroke> Strokes => strokes;
 
-        // 호스트가 입력의 GetDrawnStroke에 연결해, 획이 끝날 때마다 부르게 한다
         public void RefineStroke()
         {
             RawStroke rawStroke = strokeInputHandler.GetDrawnStroke(Settings.penColor, Settings.penWidth);
@@ -45,7 +43,6 @@ namespace Oeccsy.StrokeSketch
         public void Export(string path)
         {
             Drawing drawing = new Drawing(strokes);
-
             drawingExporter.Export(drawing, path);
         }
     }

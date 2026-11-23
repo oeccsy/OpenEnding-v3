@@ -24,6 +24,8 @@ namespace Oeccsy.StrokeMotion
         private readonly List<Vector4> uvs = new List<Vector4>();
         private readonly List<Color> colors = new List<Color>();
 
+        public float PixelsPerUnit => pixelsPerUnit;
+
         private void Awake()
         {
             EnsureMesh();

@@ -4,9 +4,8 @@ using UnityEngine;
 namespace Oeccsy.StrokeSketch
 {
     /// <summary>
-    /// 모든 점 간격을 같게 맞추는 리샘플러.
-    /// 전체 길이를 정확히 나누는 간격을 목표 간격 근처에서 골라 찍는다.
-    /// 이후 단계가 점 개수로 범위를 정하므로, 간격이 같아야 범위가 어디서나 같은 거리가 된다.
+    /// 획의 점을 고른 간격으로 다시 배치하는 리샘플러.
+    /// 원본 획을 따라 잰 전체 길이를 등분하고, 각 위치의 좌표와 시각을 보간한다.
     /// </summary>
     public class UniformStrokeResampler : IStrokeResampler
     {
@@ -15,11 +14,11 @@ namespace Oeccsy.StrokeSketch
             IReadOnlyList<StrokePoint> points = stroke.Points;
             if (points.Count < 2 || targetSpacing <= 0f) return stroke;
 
-            float[] distances = MeasureDistances(points);
+            float[] distances = MeasureCumulativeDistances(points);
             float totalLength = distances[distances.Length - 1];
             if (totalLength <= 0f) return stroke;
 
-            // 목표 간격에 가장 가까우면서 전체 길이를 정확히 나누는 간격을 쓴다
+            // 양 끝점을 포함하도록 구간 수를 정하고 실제 간격을 조정한다.
             int intervalCount = Mathf.Max(1, Mathf.RoundToInt(totalLength / targetSpacing));
             float evenSpacing = totalLength / intervalCount;
 
@@ -29,7 +28,7 @@ namespace Oeccsy.StrokeSketch
             {
                 float targetDistance = evenSpacing * i;
 
-                // 목표 거리를 품은 선분까지 앞으로만 나아간다
+                // 목표 거리가 증가하므로 선분을 처음부터 다시 찾을 필요가 없다.
                 while (segmentEnd < points.Count - 1 && distances[segmentEnd] < targetDistance) segmentEnd++;
 
                 resampled.Add(PointAtDistance(points, distances, segmentEnd, targetDistance));
@@ -38,8 +37,8 @@ namespace Oeccsy.StrokeSketch
             return new RawStroke(stroke.Color, stroke.Width, resampled);
         }
 
-        // 시작점부터 각 점까지 선을 따라 잰 거리. 마지막 값이 전체 길이다
-        private float[] MeasureDistances(IReadOnlyList<StrokePoint> points)
+        // 시작점부터 각 점까지의 누적 거리. 마지막 값이 전체 길이다.
+        private float[] MeasureCumulativeDistances(IReadOnlyList<StrokePoint> points)
         {
             float[] distances = new float[points.Count];
             for (int i = 1; i < points.Count; i++)
@@ -51,7 +50,7 @@ namespace Oeccsy.StrokeSketch
             return distances;
         }
 
-        // segmentEnd 앞 선분 위에서 목표 거리에 놓이는 점. 위치와 시각을 같은 비율로 섞는다
+        // 목표 거리가 놓인 선분 안에서 위치와 시각을 같은 비율로 보간한다.
         private StrokePoint PointAtDistance(IReadOnlyList<StrokePoint> points, float[] distances, int segmentEnd, float targetDistance)
         {
             StrokePoint from = points[segmentEnd - 1];

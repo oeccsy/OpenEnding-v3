@@ -5,13 +5,12 @@ using UnityEngine;
 namespace Oeccsy.StrokeSketch
 {
     /// <summary>
-    /// 손으로 그리는 획을 점마다 위치와 시각을 담아 기록하는 클래스.
-    /// 호스트가 포인터 입력을 그림 좌표로 바꿔 시작, 점 추가, 끝을 알려 주면 점을 모으고, 획이 끝나면 알린다.
-    /// UI를 모르므로 에디터 창과 앱이 함께 쓴다.
+    /// 손 입력을 처리해 획 데이터로 만드는 입력 핸들러.
+    /// 호스트가 전달한 위치와 시각을 기록하고, 획 입력이 끝나면 완료를 알린다.
     /// </summary>
     public class HandSketchInputHandler : IStrokeInputHandler
     {
-        // 펜을 멈추고 있을 때 같은 자리의 점이 쌓이지 않게 한다 (그림 좌표 단위)
+        // 같은 자리의 점이 쌓이지 않도록 둔 최소 거리(그림 좌표 단위).
         private const float MinPointDistance = 0.8f;
 
         private readonly List<StrokePoint> points = new List<StrokePoint>();
@@ -21,12 +20,13 @@ namespace Oeccsy.StrokeSketch
         public event Action StrokeFinished;
 
         public bool IsDrawing { get; private set; }
-        // 아직 손을 떼지 않은 획의 점. 그리는 중이 아니면 비어 있다. 그리는 중인 선을 미리 보여 줄 때 쓴다
+        // 입력 중인 획의 미리보기용 점 목록.
         public IReadOnlyList<StrokePoint> DrawingPoints => IsDrawing ? points : Array.Empty<StrokePoint>();
 
-        // 손을 뗐고 점이 2개 이상이면 다 그려진 획이다. 점 하나는 클릭이다
+        // 점 하나인 클릭은 완성된 획에서 제외한다.
         private bool HasDrawnStroke => !IsDrawing && points.Count >= 2;
 
+        // time은 초 단위이며, 이후 입력도 같은 시간 기준을 사용한다.
         public void BeginStroke(Vector2 position, double time)
         {
             points.Clear();
@@ -58,7 +58,7 @@ namespace Oeccsy.StrokeSketch
             points.Clear();
         }
 
-        // 다 그려진 획을 돌려준다. 그리는 중이거나 아직 그린 적이 없으면 null을 돌려준다
+        // 미완성이면 null. 반환해도 점은 유지되어 반복해서 얻을 수 있다.
         public RawStroke GetDrawnStroke(Color color, float width)
         {
             if (!HasDrawnStroke) return null;

@@ -4,8 +4,8 @@ using UnityEngine;
 namespace Oeccsy.StrokeSketch
 {
     /// <summary>
-    /// 곡선으로 정리하기 전의 획 하나를 점 목록으로 나타내는 클래스.
-    /// 입력 수집, 리샘플링, 손떨림 보정 단계가 이 형식으로 주고받고, 곡선 피팅을 거쳐 StrokeMotion의 Stroke가 된다.
+    /// 곡선으로 변환하기 전의 획을 나타내는 데이터.
+    /// 획의 색과 굵기, 위치와 시각이 기록된 점 목록으로 구성된다.
     /// </summary>
     public class RawStroke
     {
