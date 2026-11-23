@@ -22,8 +22,6 @@ namespace Oeccsy.StrokeSketch
 
         private readonly IStrokeSampler strokeSampler = new BezierStrokeSampler();
         private readonly PreviewRenderUtility previewUtility = new PreviewRenderUtility();
-
-        // 완성된 획은 바뀔 때만, 진행 중인 획은 그릴 때마다 메시를 다시 만든다.
         private readonly QuadStrokeRenderer finishedStrokeRenderer;
         private readonly QuadStrokeRenderer drawingStrokeRenderer;
 
@@ -95,11 +93,12 @@ namespace Oeccsy.StrokeSketch
             previewUtility.Cleanup();
         }
 
-        // 그림 좌표의 아래쪽이 월드의 -Y이므로 카메라 중심도 뒤집는다.
+        // 카메라를 그림 중심의 로컬 위치에 둔다.
         private void FitCamera(Vector2 canvasSize)
         {
-            Vector2 worldSize = canvasSize / finishedStrokeRenderer.PixelsPerUnit;
-            Vector3 cameraPosition = new Vector3(worldSize.x * 0.5f, -worldSize.y * 0.5f, -CameraDistance);
+            Vector2 worldSize = canvasSize / DrawingCoordinates.PixelsPerUnit;
+            Vector3 localCenter = DrawingCoordinates.ToLocal(canvasSize * 0.5f);
+            Vector3 cameraPosition = new Vector3(localCenter.x, localCenter.y, -CameraDistance);
 
             Camera camera = previewUtility.camera;
             camera.transform.SetPositionAndRotation(cameraPosition, Quaternion.identity);

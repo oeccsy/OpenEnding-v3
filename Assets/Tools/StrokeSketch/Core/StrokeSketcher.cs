@@ -54,7 +54,7 @@ namespace Oeccsy.StrokeSketch
 
         public void Export(string path)
         {
-            Drawing drawing = new Drawing(strokes);
+            Drawing drawing = new Drawing(Settings.canvasSize, strokes);
             drawingExporter.Export(drawing, path);
         }
     }

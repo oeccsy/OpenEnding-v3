@@ -11,10 +11,11 @@ namespace Oeccsy.StrokeMotion
         // Resources 폴더 기준 머티리얼 경로
         private const string StrokeMaterialPath = "Oeccsy.StrokeMotion/Material/StrokeLine";
 
-        public StrokeMotionObject Spawn(string name, Transform parent)
+        public StrokeMotionObject Spawn(string name, Transform parent, Vector3 localPosition)
         {
             GameObject gameObject = new GameObject(name);
             gameObject.transform.SetParent(parent, false);
+            gameObject.transform.localPosition = localPosition;
 
             StrokeMotionObject motionObject = gameObject.AddComponent<StrokeMotionObject>();
 

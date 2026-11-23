@@ -14,17 +14,12 @@ namespace Oeccsy.StrokeMotion
         // 셰이더가 가장자리를 부드럽게 칠할 여유 공간 (그림 좌표 단위)
         private const float AntialiasMargin = 2f;
 
-        [SerializeField]
-        private float pixelsPerUnit = 100f;
-
         private Mesh mesh;
 
         private readonly List<Vector3> vertices = new List<Vector3>();
         private readonly List<int> triangles = new List<int>();
         private readonly List<Vector4> uvs = new List<Vector4>();
         private readonly List<Color> colors = new List<Color>();
-
-        public float PixelsPerUnit => pixelsPerUnit;
 
         private void Awake()
         {
@@ -106,10 +101,10 @@ namespace Oeccsy.StrokeMotion
 
             int baseIndex = vertices.Count;
 
-            vertices.Add(DrawingToLocal(bottomLeft));
-            vertices.Add(DrawingToLocal(topLeft));
-            vertices.Add(DrawingToLocal(topRight));
-            vertices.Add(DrawingToLocal(bottomRight));
+            vertices.Add(DrawingCoordinates.ToLocal(bottomLeft));
+            vertices.Add(DrawingCoordinates.ToLocal(topLeft));
+            vertices.Add(DrawingCoordinates.ToLocal(topRight));
+            vertices.Add(DrawingCoordinates.ToLocal(bottomRight));
 
             triangles.Add(baseIndex + 0);
             triangles.Add(baseIndex + 1);
@@ -128,15 +123,6 @@ namespace Oeccsy.StrokeMotion
             {
                 colors.Add(color);
             }
-        }
-
-        private Vector3 DrawingToLocal(Vector2 drawingPoint)
-        {
-            // 그림 좌표는 y가 아래로 +이므로 뒤집고, pixelsPerUnit으로 나눠 월드 크기로 맞춘다
-            float x = drawingPoint.x / pixelsPerUnit;
-            float y = -drawingPoint.y / pixelsPerUnit;
-
-            return new Vector3(x, y, 0f);
         }
 
         private void ApplyToMesh()

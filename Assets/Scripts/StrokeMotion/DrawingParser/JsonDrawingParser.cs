@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Oeccsy.StrokeMotion
 {
     /// <summary>
-    /// curve-sketch 도구가 내보낸 JSON을 Drawing으로 읽는 클래스.
+    /// 그림 JSON을 Drawing으로 읽는 클래스.
     /// 손그림 원본(raw)과 피팅 설정(settings) 같은 도구용 필드는 읽지 않는다.
     /// </summary>
     public class JsonDrawingParser : IDrawingParser
@@ -27,18 +27,26 @@ namespace Oeccsy.StrokeMotion
             try
             {
                 JObject root = JObject.Parse(source);
+                JToken widthToken = root["width"];
+                JToken heightToken = root["height"];
                 JArray strokeArray = root["strokes"] as JArray;
+                if (widthToken == null) throw new FormatException("그림에 width가 없습니다.");
+                if (heightToken == null) throw new FormatException("그림에 height가 없습니다.");
                 if (strokeArray == null) throw new FormatException("strokes 배열이 없습니다.");
+
+                float width = widthToken.Value<float>();
+                float height = heightToken.Value<float>();
+                Vector2 canvasSize = new Vector2(width, height);
 
                 IEnumerable<JToken> drawableStrokeTokens = strokeArray.Where(HasCurves);
                 IEnumerable<Stroke> strokes = drawableStrokeTokens.Select(ParseStroke);
 
-                return new Drawing(strokes);
+                return new Drawing(canvasSize, strokes);
             }
             catch (Exception exception) when (exception is not FormatException)
             {
                 // 라이브러리 예외를 감춰, 호출부는 어떤 파서든 FormatException 하나만 잡으면 되게 한다
-                throw new FormatException("curve-sketch JSON 형식이 아닙니다.", exception);
+                throw new FormatException("Drawing JSON 형식이 아닙니다.", exception);
             }
         }
 

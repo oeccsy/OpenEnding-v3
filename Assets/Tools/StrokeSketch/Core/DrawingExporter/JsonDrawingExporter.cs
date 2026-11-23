@@ -27,7 +27,10 @@ namespace Oeccsy.StrokeSketch
         private string ToJson(Drawing drawing)
         {
             StringBuilder builder = new StringBuilder();
-            builder.Append("{\n  \"strokes\": [\n");
+            builder.Append("{\n");
+            builder.Append("  \"width\": ").Append(ToNumber(drawing.CanvasSize.x)).Append(",\n");
+            builder.Append("  \"height\": ").Append(ToNumber(drawing.CanvasSize.y)).Append(",\n");
+            builder.Append("  \"strokes\": [\n");
 
             for (int i = 0; i < drawing.Strokes.Count; i++)
             {

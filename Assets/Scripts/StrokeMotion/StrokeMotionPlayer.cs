@@ -20,7 +20,7 @@ namespace Oeccsy.StrokeMotion
         
         private void Start()
         {
-            Load("Oeccsy.StrokeMotion/Drawings/nebula");
+            Load("Drawings/test3");
         }
 
         private void Update()
@@ -39,7 +39,8 @@ namespace Oeccsy.StrokeMotion
             IReadOnlyList<SampledStroke> sampledStrokes = strokeSampler.Sample(drawing.Strokes);
             IReadOnlyList<ScheduledStroke> scheduledStrokes = strokeScheduler.Schedule(sampledStrokes);
 
-            StrokeMotionObject motionObject = objectSpawner.Spawn(drawingPath, transform);
+            Vector3 centeredPosition = DrawingCoordinates.CalculateCenteredPosition(drawing.CanvasSize);
+            StrokeMotionObject motionObject = objectSpawner.Spawn(drawingPath, transform, centeredPosition);
             motionObject.ScheduledStrokes = scheduledStrokes;
             
             playList.Add(motionObject);
