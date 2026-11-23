@@ -1,0 +1,21 @@
+{
+    "name": "Oeccsy.StrokeSketch.Mcp.Editor",
+    "rootNamespace": "Oeccsy.StrokeSketch.Mcp",
+    "references": [
+        "Oeccsy.StrokeSketch",
+        "Oeccsy.StrokeSketch.Editor",
+        "Oeccsy.StrokeMotion",
+        "MCPForUnity.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

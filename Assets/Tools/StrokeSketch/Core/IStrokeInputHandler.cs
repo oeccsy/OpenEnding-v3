@@ -1,18 +1,15 @@
 using System;
-using UnityEngine;
+using System.Collections.Generic;
 
 namespace Oeccsy.StrokeSketch
 {
     /// <summary>
     /// 입력을 처리해 완성된 획을 제공하는 인터페이스.
-    /// 획의 완료를 이벤트로 알리고, 지정한 색과 굵기를 적용한 획 데이터를 반환한다.
+    /// 획이 끝나면 그 점 목록을 이벤트에 실어 알린다. 색과 굵기는 받는 쪽의 설정이 정한다.
     /// </summary>
     public interface IStrokeInputHandler
     {
-        // 완료 신호만 전달한다. 획은 GetDrawnStroke로 얻는다.
-        event Action StrokeFinished;
-
-        // 완성된 획이 없으면 null을 반환한다.
-        RawStroke GetDrawnStroke(Color color, float width);
+        // 점 목록은 알림 동안만 유효하다. 받는 쪽에서 보관하려면 복사한다.
+        event Action<IReadOnlyList<StrokePoint>> StrokeFinished;
     }
 }

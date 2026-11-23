@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using Oeccsy.StrokeMotion;
 using UnityEditor;
 using UnityEditor.ShortcutManagement;
 using UnityEngine;
@@ -15,23 +17,32 @@ namespace Oeccsy.StrokeSketch
     {
         private const string GuidePath = "Assets/Tools/StrokeSketch/Editor/Docs/SketchSettingsGuide.html";
         private const string DrawingFolderPath = "Assets/Resources/Drawings";
+        // 프로젝트의 Temp 폴더는 에셋으로 가져오지 않고, Unity를 닫으면 지워진다.
+        private const string CaptureFolderPath = "Temp/StrokeSketch";
 
         private const float SidePanelWidth = 300f;
 
         private static readonly Vector2 MinWindowSize = new Vector2(640f, 400f);
 
-        private HandSketchInputHandler strokeInputHandler;
+        private HandSketchInputHandler handInputHandler;
+        private SvgStrokeInputHandler svgInputHandler;
         private StrokeSketcher strokeSketcher;
         private StrokeSketchPreview preview;
         private SketchControlView controlView;
         private SketchSettingsView settingsView;
         private SketchCanvasView canvasView;
 
+        public SketchSettings Settings => strokeSketcher.Settings;
+        public IReadOnlyList<Stroke> Strokes => strokeSketcher.Strokes;
+
+        // 메뉴와 MCP 도구가 함께 쓴다. 이미 열려 있으면 그 창을 돌려준다.
         [MenuItem("Window/Stroke Sketch")]
-        private static void Open()
+        public static StrokeSketchWindow Open()
         {
             StrokeSketchWindow window = GetWindow<StrokeSketchWindow>("Stroke Sketch");
             window.minSize = MinWindowSize;
+
+            return window;
         }
 
         [Shortcut("Stroke Sketch/Remove Last Stroke", typeof(StrokeSketchWindow), KeyCode.Z, ShortcutModifiers.Action)]
@@ -57,11 +68,13 @@ namespace Oeccsy.StrokeSketch
 
         private void OnEnable()
         {
-            strokeInputHandler = new HandSketchInputHandler();
-            strokeSketcher = new StrokeSketcher(strokeInputHandler, SketchSettings.Default);
+            handInputHandler = new HandSketchInputHandler();
+            svgInputHandler = new SvgStrokeInputHandler();
+            strokeSketcher = new StrokeSketcher(SketchSettings.Default);
             preview = new StrokeSketchPreview();
 
-            strokeInputHandler.StrokeFinished += OnStrokeFinished;
+            handInputHandler.StrokeFinished += OnStrokeFinished;
+            svgInputHandler.StrokeFinished += OnStrokeFinished;
         }
 
         private void CreateGUI()
@@ -77,10 +90,10 @@ namespace Oeccsy.StrokeSketch
 
             canvasView = new SketchCanvasView(strokeSketcher.Settings.canvasSize);
             canvasView.CanvasDrawRequested += OnCanvasDrawRequested;
-            canvasView.CanvasPressed += strokeInputHandler.BeginStroke;
-            canvasView.CanvasDragged += strokeInputHandler.AddPoint;
-            canvasView.CanvasReleased += strokeInputHandler.EndStroke;
-            canvasView.CanvasCanceled += strokeInputHandler.CancelStroke;
+            canvasView.CanvasPressed += handInputHandler.BeginStroke;
+            canvasView.CanvasDragged += handInputHandler.AddPoint;
+            canvasView.CanvasReleased += handInputHandler.EndStroke;
+            canvasView.CanvasCanceled += handInputHandler.CancelStroke;
 
             VisualElement sidePanel = new VisualElement();
             sidePanel.style.width = SidePanelWidth;
@@ -98,9 +111,32 @@ namespace Oeccsy.StrokeSketch
             preview.Dispose();
         }
 
-        private void OnStrokeFinished()
+        // 그린 획 수를 반환한다. 경로 문법이 틀리면 FormatException.
+        // 손 입력과 달리 화면을 다시 그릴 계기가 없어 직접 다시 그린다.
+        public int DrawSvgPath(string pathData)
         {
-            strokeSketcher.RefineStroke();
+            int drawnCount = svgInputHandler.ReadPath(pathData);
+            canvasView.RepaintCanvas();
+
+            return drawnCount;
+        }
+
+        // 완성된 획을 캔버스 크기 PNG로 저장하고 전체 경로를 반환한다. 이전 캡처와 비교할 수 있게 시각을 이름에 붙인다.
+        public string CaptureCanvas()
+        {
+            byte[] png = preview.CapturePng(strokeSketcher.Settings.canvasSize);
+
+            Directory.CreateDirectory(CaptureFolderPath);
+            string fileName = $"capture-{DateTime.Now:yyyyMMdd-HHmmss-fff}.png";
+            string path = Path.Combine(CaptureFolderPath, fileName);
+            File.WriteAllBytes(path, png);
+
+            return Path.GetFullPath(path);
+        }
+
+        private void OnStrokeFinished(IReadOnlyList<StrokePoint> points)
+        {
+            strokeSketcher.RefineStroke(points);
             preview.RebuildFinishedStrokes(strokeSketcher.Strokes);
         }
 
@@ -157,7 +193,7 @@ namespace Oeccsy.StrokeSketch
 
         private void OnCanvasDrawRequested(Rect rect)
         {
-            preview.Draw(rect, strokeInputHandler.DrawingPoints, strokeSketcher.Settings);
+            preview.Draw(rect, handInputHandler.DrawingPoints, strokeSketcher.Settings);
         }
     }
 }

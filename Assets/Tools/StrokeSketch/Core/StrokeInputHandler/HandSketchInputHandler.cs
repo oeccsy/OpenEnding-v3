@@ -17,7 +17,7 @@ namespace Oeccsy.StrokeSketch
 
         private double strokeStartTime;
 
-        public event Action StrokeFinished;
+        public event Action<IReadOnlyList<StrokePoint>> StrokeFinished;
 
         public bool IsDrawing { get; private set; }
         // 입력 중인 획의 미리보기용 점 목록.
@@ -49,21 +49,13 @@ namespace Oeccsy.StrokeSketch
             RecordPoint(position, time);
             IsDrawing = false;
 
-            if (HasDrawnStroke) StrokeFinished?.Invoke();
+            if (HasDrawnStroke) StrokeFinished?.Invoke(points);
         }
 
         public void CancelStroke()
         {
             IsDrawing = false;
             points.Clear();
-        }
-
-        // 미완성이면 null. 반환해도 점은 유지되어 반복해서 얻을 수 있다.
-        public RawStroke GetDrawnStroke(Color color, float width)
-        {
-            if (!HasDrawnStroke) return null;
-
-            return new RawStroke(color, width, points);
         }
 
         private void RecordPoint(Vector2 position, double time)

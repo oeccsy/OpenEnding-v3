@@ -9,7 +9,6 @@ namespace Oeccsy.StrokeSketch
     /// </summary>
     public class StrokeSketcher
     {
-        private readonly IStrokeInputHandler strokeInputHandler;
         private readonly IStrokeResampler strokeResampler = new UniformStrokeResampler();
         private readonly ICornerFinder cornerFinder = new AngleSpeedCornerFinder();
         private readonly IStrokeSmoother strokeSmoother = new MovingAverageStrokeSmoother();
@@ -18,19 +17,18 @@ namespace Oeccsy.StrokeSketch
 
         private readonly List<Stroke> strokes = new List<Stroke>();
 
-        public StrokeSketcher(IStrokeInputHandler strokeInputHandler, SketchSettings settings)
+        public StrokeSketcher(SketchSettings settings)
         {
-            this.strokeInputHandler = strokeInputHandler;
             Settings = settings;
         }
 
         public SketchSettings Settings { get; set; }
         public IReadOnlyList<Stroke> Strokes => strokes;
 
-        public void RefineStroke()
+        // 입력의 점 목록에 지금 펜 설정의 색과 굵기를 입혀 정리한다.
+        public void RefineStroke(IReadOnlyList<StrokePoint> points)
         {
-            RawStroke rawStroke = strokeInputHandler.GetDrawnStroke(Settings.penColor, Settings.penWidth);
-            if (rawStroke == null) return;
+            RawStroke rawStroke = new RawStroke(Settings.penColor, Settings.penWidth, points);
 
             RawStroke resampledStroke = strokeResampler.Resample(rawStroke, Settings.targetSpacing);
             IReadOnlyList<int> corners = cornerFinder.FindCorners(resampledStroke, Settings.cornerAngle, Settings.cornerSpeedRatio);

@@ -81,6 +81,24 @@ namespace Oeccsy.StrokeSketch
             GUI.DrawTexture(rect, image, ScaleMode.StretchToFill, false);
         }
 
+        // 캔버스 크기로 완성된 획만 그려 PNG 데이터로 반환한다. IMGUI 단계와 상관없이 부를 수 있다.
+        public byte[] CapturePng(Vector2 canvasSize)
+        {
+            // 입력 중인 획은 넣지 않는다. 다음 Draw가 다시 만든다
+            drawingStrokeRenderer.BuildMesh(new List<TrimmedStroke>());
+
+            FitCamera(canvasSize);
+            Rect rect = new Rect(Vector2.zero, canvasSize);
+            previewUtility.BeginStaticPreview(rect);
+            previewUtility.Render(allowScriptableRenderPipeline: true, updatefov: false);
+            Texture2D texture = previewUtility.EndStaticPreview();
+
+            byte[] png = texture.EncodeToPNG();
+            Object.DestroyImmediate(texture);
+
+            return png;
+        }
+
         // Cleanup은 씬 오브젝트를 정리하므로, 생성한 메시는 별도로 해제한다.
         public void Dispose()
         {
