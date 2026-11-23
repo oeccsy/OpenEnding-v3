@@ -51,6 +51,11 @@ namespace Oeccsy.StrokeSketch
             canvas.MarkDirtyRepaint();
         }
 
+        public void RepaintCanvas()
+        {
+            canvas.MarkDirtyRepaint();
+        }
+
         private void FitCanvas()
         {
             Vector2 available = contentRect.size - Vector2.one * (CanvasMargin * 2f);

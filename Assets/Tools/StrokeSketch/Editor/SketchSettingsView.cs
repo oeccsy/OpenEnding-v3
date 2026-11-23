@@ -11,7 +11,6 @@ namespace Oeccsy.StrokeSketch
     /// </summary>
     public class SketchSettingsView : VisualElement
     {
-        private const float PanelWidth = 300f;
         private const float PanelPadding = 8f;
         private const float SectionPadding = 6f;
         private const float SectionRadius = 4f;
@@ -25,8 +24,6 @@ namespace Oeccsy.StrokeSketch
         {
             settings = initialSettings;
 
-            style.width = PanelWidth;
-            style.flexShrink = 0f;
             style.paddingLeft = PanelPadding;
             style.paddingRight = PanelPadding;
             style.paddingTop = PanelPadding;
@@ -45,16 +42,9 @@ namespace Oeccsy.StrokeSketch
             AddField(refineSection, new Slider("꺾임 속도 비율", 0f, 1f) { showInputField = true }, settings.cornerSpeedRatio, (value) => settings.cornerSpeedRatio = value);
             AddField(refineSection, new SliderInt("다듬기 반경", 0, 10) { showInputField = true }, settings.smoothingRadius, (value) => settings.smoothingRadius = value);
             AddField(refineSection, new Slider("피팅 허용 오차", 0.5f, 12f) { showInputField = true }, settings.tolerance, (value) => settings.tolerance = value);
-
-            // 자주 쓰지 않는 도움말은 패널 바닥에 붙인다.
-            Button helpButton = new Button(() => HelpRequested?.Invoke()) { text = "파라미터 안내" };
-            helpButton.style.marginTop = StyleKeyword.Auto;
-            helpButton.style.marginBottom = PanelPadding;
-            Add(helpButton);
         }
 
         public event Action<SketchSettings> SettingsChanged;
-        public event Action HelpRequested;
 
         private VisualElement AddSection(string title)
         {

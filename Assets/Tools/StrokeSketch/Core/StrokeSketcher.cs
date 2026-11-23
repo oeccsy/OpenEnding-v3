@@ -40,6 +40,18 @@ namespace Oeccsy.StrokeSketch
             strokes.Add(stroke);
         }
 
+        public void RemoveLastStroke()
+        {
+            if (strokes.Count == 0) return;
+
+            strokes.RemoveAt(strokes.Count - 1);
+        }
+
+        public void ClearStrokes()
+        {
+            strokes.Clear();
+        }
+
         public void Export(string path)
         {
             Drawing drawing = new Drawing(strokes);
