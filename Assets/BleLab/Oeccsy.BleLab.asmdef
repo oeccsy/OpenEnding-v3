@@ -1,0 +1,16 @@
+{
+    "name": "Oeccsy.BleLab",
+    "rootNamespace": "Oeccsy.BleLab",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_EDITOR || BLE_LAB"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

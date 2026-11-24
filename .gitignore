@@ -142,3 +142,8 @@ crashlytics-build.properties
 
 # docs
 /[Dd]ocs/
+# DOTween (에셋 스토어에서 각자 설치한다)
+/[Aa]ssets/Plugins/Demigiant/
+/[Aa]ssets/Plugins/Demigiant.meta
+/[Aa]ssets/Resources/DOTweenSettings.asset
+/[Aa]ssets/Resources/DOTweenSettings.asset.meta
