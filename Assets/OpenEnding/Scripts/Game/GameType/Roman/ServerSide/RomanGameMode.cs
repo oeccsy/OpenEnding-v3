@@ -62,12 +62,12 @@ namespace Game.GameType.Roman.ServerSide
 
         private void InitDeviceOwnCard()
         {
-            var randomNumbers = Utils.GetCombinationInt(1, 7, 7); // TODO : 카드가 늘면 같이 늘린다 (7 = PaperPlane)
-            Utils.ShuffleList(randomNumbers);
+            List<CardType> cardTypes = cardContainer.GetAvailableCardTypes();
+            Utils.ShuffleList(cardTypes);
 
             for (int i = 0; i < NetworkManager.Instance.connectedDeviceList.Count; i++)
             {
-                CardType cardType = (CardType)randomNumbers[i];
+                CardType cardType = cardTypes[i];
                 ColorPalette.ColorName deviceColor = NetworkManager.Instance.connectedDeviceList[i];
                 
                 cardContainer.UseCard(cardType, deviceColor);

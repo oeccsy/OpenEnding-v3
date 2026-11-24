@@ -15,10 +15,8 @@ namespace Game.GameType.Roman.ServerSide
         
         public RomanCardContainer()
         {
+            // 테스트용으로 4장만 쓴다. 망원경, 작품, 새싹은 잠시 뺐다
             availableCards.Add(CardType.Star, new Star());
-            availableCards.Add(CardType.Telescope, new Telescope());
-            availableCards.Add(CardType.Artwork, new Artwork());
-            availableCards.Add(CardType.Sprout, new Sprout());
             availableCards.Add(CardType.RoleModel, new RoleModel());
             availableCards.Add(CardType.Shower, new Shower());
             availableCards.Add(CardType.PaperPlane, new PaperPlane());
@@ -35,6 +33,12 @@ namespace Game.GameType.Roman.ServerSide
             usedCards.Add(cardType, cardData);
             
             cardData.OnEnterField();
+        }
+
+        // 아직 필드에 나오지 않은 카드 종류. 처음 나눠 줄 카드를 고를 때 쓴다
+        public List<CardType> GetAvailableCardTypes()
+        {
+            return availableCards.Keys.ToList();
         }
 
         public RomanCard ReplaceCard(CardType cardType)
