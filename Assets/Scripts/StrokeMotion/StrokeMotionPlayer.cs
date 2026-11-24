@@ -9,41 +9,46 @@ namespace Oeccsy.StrokeMotion
     /// </summary>
     public class StrokeMotionPlayer : MonoBehaviour
     {
+        // 펜 속도는 초당 그림 좌표 단위, 획 사이 쉬는 시간은 초
+        public const float DefaultPenSpeed = 900f;
+        public const float DefaultGapSeconds = 0.1f;
+
         private readonly IDrawingParser drawingParser = new JsonDrawingParser();
         private readonly IStrokeSampler strokeSampler = new BezierStrokeSampler();
-        private readonly IStrokeScheduler strokeScheduler = new StrokeScheduler();
         private readonly IObjectSpawner objectSpawner = new StrokeMotionObjectSpawner();
         private readonly IProgressEvaluator progressEvaluator = new EaseInOutProgressEvaluator();
         private readonly IStrokeTrimmer strokeTrimmer = new LengthBasedStrokeTrimmer();
 
         private readonly List<StrokeMotionObject> playList = new List<StrokeMotionObject>();
-        
-        private void Start()
-        {
-            Load("Drawings/test3");
-        }
 
         private void Update()
         {
+            // 부모와 함께 지워진 객체는 목록에서 뺀다
+            playList.RemoveAll((motionObject) => motionObject == null);
+
             foreach (StrokeMotionObject motionObject in playList)
             {
-                Draw(motionObject, Time.time);
+                float elapsed = Time.time - motionObject.StartTime;
+                Draw(motionObject, elapsed);
             }
         }
 
-        public void Load(string drawingPath)
+        // 그림을 parent 아래에 불러온다. Play()를 부르기 전까지는 아무것도 그려지지 않는다.
+        public StrokeMotionObject Load(string drawingPath, Transform parent, float penSpeed = DefaultPenSpeed, float gapSeconds = DefaultGapSeconds)
         {
             string source = drawingParser.Load(drawingPath);
             Drawing drawing = drawingParser.Parse(source);
 
+            IStrokeScheduler strokeScheduler = new StrokeScheduler(penSpeed, gapSeconds);
             IReadOnlyList<SampledStroke> sampledStrokes = strokeSampler.Sample(drawing.Strokes);
             IReadOnlyList<ScheduledStroke> scheduledStrokes = strokeScheduler.Schedule(sampledStrokes);
 
             Vector3 centeredPosition = DrawingCoordinates.CalculateCenteredPosition(drawing.CanvasSize);
-            StrokeMotionObject motionObject = objectSpawner.Spawn(drawingPath, transform, centeredPosition);
+            StrokeMotionObject motionObject = objectSpawner.Spawn(drawingPath, parent, centeredPosition);
             motionObject.ScheduledStrokes = scheduledStrokes;
-            
+
             playList.Add(motionObject);
+            return motionObject;
         }
 
         private void Draw(StrokeMotionObject motionObject, float time)
