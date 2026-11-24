@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Utility
 {
@@ -13,11 +14,18 @@ namespace Utility
         public event ShakeHandler OnEveryShake;
         public event ShakeHandler OnNextShake;
 
+        private void Awake()
+        {
+            if (Accelerometer.current != null) InputSystem.EnableDevice(Accelerometer.current);
+        }
+
         private void Update()
         {
             if (!isShakeable) return;
-            
-            var value = Input.acceleration.magnitude;
+            if (Accelerometer.current == null || !Accelerometer.current.enabled) return;
+
+            // Android에서 Input System은 가속도를 옛 Input.acceleration과 같은 g 단위로 준다. 기준값 threshold도 g 단위다
+            var value = Accelerometer.current.acceleration.ReadValue().magnitude;
             
             if (value > threshold)
             {

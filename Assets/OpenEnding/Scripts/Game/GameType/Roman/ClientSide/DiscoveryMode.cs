@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Utility;
 using Utility.Hierarchy;
 
@@ -18,14 +19,15 @@ namespace Game.GameType.Roman.ClientSide
         {
             _mainCamera = Camera.main;
             _cameraTransform = _mainCamera.transform;
-            Input.gyro.enabled = true;
+            if (GravitySensor.current != null) InputSystem.EnableDevice(GravitySensor.current);
         }
 
         private void Update()
         {
             if (!isDiscoveryMode) return;
-            
-            Vector3 gravity = Input.gyro.gravity;
+            if (GravitySensor.current == null || !GravitySensor.current.enabled) return;
+
+            Vector3 gravity = GravitySensor.current.gravity.ReadValue().normalized;
             Vector3 cameraRot = new Vector3(gravity.z * -90f, gravity.x * 90f, 0);
             
             _cameraTransform.rotation = Quaternion.Euler(cameraRot);

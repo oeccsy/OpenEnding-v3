@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
 namespace Utility
@@ -19,17 +20,19 @@ namespace Utility
 
         private void Awake()
         {
-            Input.gyro.enabled = false;
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
-            Input.gyro.enabled = true;
+            if (GravitySensor.current != null) InputSystem.EnableDevice(GravitySensor.current);
 #endif
         }
     
         private void Update()
         {
-            if (!Input.gyro.enabled) return;
-            
-            if (Input.gyro.gravity.z < -0.95f)
+            if (GravitySensor.current == null || !GravitySensor.current.enabled) return;
+
+            // 센서 단위와 상관없이 기울어진 방향만 보도록 정규화한다. 기준값은 중력 크기를 1로 본 값이다
+            Vector3 gravity = GravitySensor.current.gravity.ReadValue().normalized;
+
+            if (gravity.z < -0.95f)
             {
                 if (curFace == Define.DisplayedFace.Head) return;
                 
@@ -39,7 +42,7 @@ namespace Utility
                 OnNextHead = null;
             }
 
-            if (-0.7f < Input.gyro.gravity.z && Input.gyro.gravity.z < 0.7f)
+            if (-0.7f < gravity.z && gravity.z < 0.7f)
             {
                 if (curFace == Define.DisplayedFace.Stand) return;
                 
@@ -49,7 +52,7 @@ namespace Utility
                 OnNextStand = null;
             }
             
-            if (Input.gyro.gravity.z > 0.95f)
+            if (gravity.z > 0.95f)
             {
                 if (curFace == Define.DisplayedFace.Tail) return;
                 

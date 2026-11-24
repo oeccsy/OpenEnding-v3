@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Utility
 {
@@ -8,17 +9,16 @@ namespace Utility
         
         private void Awake()
         {
-            Input.gyro.enabled = false;
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
-            Input.gyro.enabled = true;
+            if (GravitySensor.current != null) InputSystem.EnableDevice(GravitySensor.current);
 #endif
         }
 
         private void Update()
         {
-            if (!Input.gyro.enabled) return;
+            if (GravitySensor.current == null || !GravitySensor.current.enabled) return;
 
-            gravity = Input.gyro.gravity;
+            gravity = GravitySensor.current.gravity.ReadValue().normalized;
         }
     }
 }
