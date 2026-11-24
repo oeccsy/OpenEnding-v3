@@ -49,7 +49,7 @@ namespace Oeccsy.StrokeSketch
         private static void RemoveLastStrokeShortcut(ShortcutArguments arguments)
         {
             StrokeSketchWindow window = (StrokeSketchWindow)arguments.context;
-            window.OnUndoRequested();
+            window.RemoveLastStroke();
         }
 
         [Shortcut("Stroke Sketch/Clear Strokes", typeof(StrokeSketchWindow), KeyCode.Delete, ShortcutModifiers.Action)]
@@ -80,7 +80,7 @@ namespace Oeccsy.StrokeSketch
         private void CreateGUI()
         {
             controlView = new SketchControlView();
-            controlView.UndoRequested += OnUndoRequested;
+            controlView.UndoRequested += RemoveLastStroke;
             controlView.ClearRequested += OnClearRequested;
             controlView.HelpRequested += OnHelpRequested;
             controlView.ExportRequested += OnExportRequested;
@@ -121,6 +121,15 @@ namespace Oeccsy.StrokeSketch
             return drawnCount;
         }
 
+        // 그린 획 수를 반환한다. 문서를 읽을 수 없으면 FormatException.
+        public int DrawSvgDocument(string svgText)
+        {
+            int drawnCount = svgInputHandler.ReadDocument(svgText, strokeSketcher.Settings.canvasSize);
+            canvasView.RepaintCanvas();
+
+            return drawnCount;
+        }
+
         // 완성된 획을 캔버스 크기 PNG로 저장하고 전체 경로를 반환한다. 이전 캡처와 비교할 수 있게 시각을 이름에 붙인다.
         public string CaptureCanvas()
         {
@@ -134,17 +143,45 @@ namespace Oeccsy.StrokeSketch
             return Path.GetFullPath(path);
         }
 
-        private void OnStrokeFinished(IReadOnlyList<StrokePoint> points)
+        // 설정을 통째로 갈아끼운다. 다음에 바꿀 때까지 손 입력과 SVG 입력 모두에 쓰이고, 이미 그린 획은 그대로 둔다.
+        public void ChangeSettings(SketchSettings settings)
         {
-            strokeSketcher.RefineStroke(points);
-            preview.RebuildFinishedStrokes(strokeSketcher.Strokes);
+            strokeSketcher.Settings = settings;
+            settingsView.ShowSettings(settings);
+            canvasView.ResizeCanvas(settings.canvasSize);
         }
 
-        private void OnUndoRequested()
+        public void RemoveLastStroke()
         {
             strokeSketcher.RemoveLastStroke();
             preview.RebuildFinishedStrokes(strokeSketcher.Strokes);
             canvasView.RepaintCanvas();
+        }
+
+        // 확인 창 없이 지운다. 사람이 누르는 버튼은 OnClearRequested에서 먼저 묻는다.
+        public void ClearStrokes()
+        {
+            strokeSketcher.ClearStrokes();
+            preview.RebuildFinishedStrokes(strokeSketcher.Strokes);
+            canvasView.RepaintCanvas();
+        }
+
+        // 저장 창 없이 Drawings 폴더에 저장하고 에셋 경로를 반환한다. 같은 이름이 있으면 덮어쓰지 않고 IOException.
+        public string ExportDrawing(string name)
+        {
+            string path = $"{DrawingFolderPath}/{name}.json";
+            if (File.Exists(path)) throw new IOException($"이미 있는 파일입니다 : {path}");
+
+            strokeSketcher.Export(path);
+            AssetDatabase.ImportAsset(path);
+
+            return path;
+        }
+
+        private void OnStrokeFinished(IReadOnlyList<StrokePoint> points)
+        {
+            strokeSketcher.RefineStroke(points);
+            preview.RebuildFinishedStrokes(strokeSketcher.Strokes);
         }
 
         private void OnClearRequested()
@@ -153,9 +190,7 @@ namespace Oeccsy.StrokeSketch
             if (strokeSketcher.Strokes.Count == 0) return;
             if (!EditorUtility.DisplayDialog("전체 지우기", "그린 획을 모두 지울까요? 되돌릴 수 없습니다.", "지우기", "취소")) return;
 
-            strokeSketcher.ClearStrokes();
-            preview.RebuildFinishedStrokes(strokeSketcher.Strokes);
-            canvasView.RepaintCanvas();
+            ClearStrokes();
         }
 
         private void OnSettingsChanged(SketchSettings changedSettings)

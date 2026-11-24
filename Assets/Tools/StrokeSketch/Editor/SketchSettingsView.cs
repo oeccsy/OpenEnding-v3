@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -18,6 +19,9 @@ namespace Oeccsy.StrokeSketch
         // 반투명 회색이라 라이트, 다크 테마 모두에서 묶음이 구분된다.
         private static readonly Color SectionColor = new Color(0.5f, 0.5f, 0.5f, 0.12f);
 
+        // 입력칸마다 지금 설정 값으로 다시 채우는 동작. 설정이 바깥에서 통째로 바뀔 때 한 번에 부른다.
+        private readonly List<Action> fieldRefreshers = new List<Action>();
+
         private SketchSettings settings;
 
         public SketchSettingsView(SketchSettings initialSettings)
@@ -30,21 +34,33 @@ namespace Oeccsy.StrokeSketch
 
             // 라벨을 빼서 X, Y 입력칸이 패널 폭을 모두 쓰게 한다.
             VisualElement canvasSection = AddSection("캔버스 크기");
-            AddField(canvasSection, new Vector2Field(), settings.canvasSize, (value) => settings.canvasSize = value);
+            AddField(canvasSection, new Vector2Field(), () => settings.canvasSize, (value) => settings.canvasSize = value);
 
             VisualElement penSection = AddSection("펜");
-            AddField(penSection, new ColorField("색"), settings.penColor, (value) => settings.penColor = value);
-            AddField(penSection, new Slider("두께", 0.5f, 100f) { showInputField = true }, settings.penWidth, (value) => settings.penWidth = value);
+            AddField(penSection, new ColorField("색"), () => settings.penColor, (value) => settings.penColor = value);
+            AddField(penSection, new Slider("두께", 0.5f, 100f) { showInputField = true }, () => settings.penWidth, (value) => settings.penWidth = value);
+            AddField(penSection, new IntegerField("레이어"), () => settings.layer, (value) => settings.layer = value);
 
             VisualElement refineSection = AddSection("다듬기");
-            AddField(refineSection, new Slider("점 간격", 1f, 12f) { showInputField = true }, settings.targetSpacing, (value) => settings.targetSpacing = value);
-            AddField(refineSection, new Slider("꺾임 각도", 10f, 181f) { showInputField = true }, settings.cornerAngle, (value) => settings.cornerAngle = value);
-            AddField(refineSection, new Slider("꺾임 속도 비율", 0f, 1f) { showInputField = true }, settings.cornerSpeedRatio, (value) => settings.cornerSpeedRatio = value);
-            AddField(refineSection, new SliderInt("다듬기 반경", 0, 10) { showInputField = true }, settings.smoothingRadius, (value) => settings.smoothingRadius = value);
-            AddField(refineSection, new Slider("피팅 허용 오차", 0.5f, 12f) { showInputField = true }, settings.tolerance, (value) => settings.tolerance = value);
+            AddField(refineSection, new Slider("점 간격", 1f, 12f) { showInputField = true }, () => settings.targetSpacing, (value) => settings.targetSpacing = value);
+            AddField(refineSection, new Slider("꺾임 각도", 10f, 181f) { showInputField = true }, () => settings.cornerAngle, (value) => settings.cornerAngle = value);
+            AddField(refineSection, new Slider("꺾임 속도 비율", 0f, 1f) { showInputField = true }, () => settings.cornerSpeedRatio, (value) => settings.cornerSpeedRatio = value);
+            AddField(refineSection, new SliderInt("다듬기 반경", 0, 10) { showInputField = true }, () => settings.smoothingRadius, (value) => settings.smoothingRadius = value);
+            AddField(refineSection, new Slider("피팅 허용 오차", 0.5f, 12f) { showInputField = true }, () => settings.tolerance, (value) => settings.tolerance = value);
         }
 
         public event Action<SketchSettings> SettingsChanged;
+
+        // 바깥(MCP)에서 바뀐 설정을 입력칸에 반영한다. 바꾼 쪽이 이미 설정을 알고 있으므로 다시 알리지 않는다.
+        public void ShowSettings(SketchSettings changedSettings)
+        {
+            settings = changedSettings;
+
+            foreach (Action refreshField in fieldRefreshers)
+            {
+                refreshField();
+            }
+        }
 
         private VisualElement AddSection(string title)
         {
@@ -69,9 +85,17 @@ namespace Oeccsy.StrokeSketch
             return section;
         }
 
-        private void AddField<T>(VisualElement section, BaseField<T> field, T initialValue, Action<T> applyValue)
+        // readValue로 입력칸을 채우고, 사람이 값을 바꾸면 applyValue로 설정에 넣은 뒤 알린다.
+        private void AddField<T>(VisualElement section, BaseField<T> field, Func<T> readValue, Action<T> applyValue)
         {
-            field.SetValueWithoutNotify(initialValue);
+            Action refreshField = () =>
+            {
+                T value = readValue();
+                field.SetValueWithoutNotify(value);
+            };
+            refreshField();
+            fieldRefreshers.Add(refreshField);
+
             field.AddToClassList(BaseField<T>.alignedFieldUssClassName);
             field.RegisterValueChangedCallback((changeEvent) =>
             {
