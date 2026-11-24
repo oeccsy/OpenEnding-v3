@@ -61,7 +61,7 @@ namespace Game.GameType.Roman
         Sprout,
         RoleModel,
         Shower,
-        G,
+        PaperPlane,
         H,
         I,
         J

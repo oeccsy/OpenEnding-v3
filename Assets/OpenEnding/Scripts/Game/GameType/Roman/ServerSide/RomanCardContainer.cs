@@ -21,6 +21,7 @@ namespace Game.GameType.Roman.ServerSide
             availableCards.Add(CardType.Sprout, new Sprout());
             availableCards.Add(CardType.RoleModel, new RoleModel());
             availableCards.Add(CardType.Shower, new Shower());
+            availableCards.Add(CardType.PaperPlane, new PaperPlane());
         }
 
         public void UseCard(CardType cardType, ColorPalette.ColorName deviceColor)
@@ -57,6 +58,24 @@ namespace Game.GameType.Roman.ServerSide
             newCard.OnEnterField();
 
             return newCard;
+        }
+
+        // 필드의 두 카드가 디바이스를 맞바꾼다. 보이는 면은 디바이스의 상태이므로 디바이스를 따라간다
+        public void SwapCards(CardType firstType, CardType secondType)
+        {
+            if (!usedCards.ContainsKey(firstType)) return;
+            if (!usedCards.ContainsKey(secondType)) return;
+
+            RomanCard firstCard = usedCards[firstType];
+            RomanCard secondCard = usedCards[secondType];
+
+            ColorPalette.ColorName firstColor = firstCard.deviceColor;
+            firstCard.deviceColor = secondCard.deviceColor;
+            secondCard.deviceColor = firstColor;
+
+            Define.DisplayedFace firstFace = firstCard.displayedFace;
+            firstCard.displayedFace = secondCard.displayedFace;
+            secondCard.displayedFace = firstFace;
         }
 
         public RomanCard GetCard(CardType cardType)

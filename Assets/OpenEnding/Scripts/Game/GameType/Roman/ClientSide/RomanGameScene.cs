@@ -15,6 +15,12 @@ namespace Game.GameType.Roman.ClientSide
     {
         public RomanCard card;
         public RomanCard discoveryCard;
+
+        // 결과 화면은 승리를 만든 카드의 애니메이션이 끝난 뒤에 띄운다
+        private const float ResultCheckDelaySeconds = 0.5f;
+        private const float ResultDelaySeconds = 1f;
+
+        private bool isCardShowing;
         
         protected override void Awake()
         {
@@ -66,6 +72,15 @@ namespace Game.GameType.Roman.ClientSide
             StartCoroutine(ReplaceRoutine());
         }
 
+        // 엎어져 있는 디바이스의 카드를 연출 없이 바꾼다. 다음에 세웠을 때 바뀐 카드가 보인다
+        public void SwapCardSilently(CardType cardType)
+        {
+            $"Swap silently to {cardType}".Log();
+            if (card != null) Destroy(card.gameObject);
+
+            CreateCard(cardType);
+        }
+
         public void DiscoverCard(CardType cardType)
         {
             $"Discover {cardType}".Log();
@@ -73,6 +88,7 @@ namespace Game.GameType.Roman.ClientSide
             
             IEnumerator DiscoverRoutine()
             {
+                isCardShowing = true;
                 yield return card.Hide();
                 yield return card.cardInfoUI.Hide();
                 
@@ -81,6 +97,7 @@ namespace Game.GameType.Roman.ClientSide
                 var prefab = Resources.Load<GameObject>($"Prefabs/Roman/{cardType.ToString()}");
                 discoveryCard = Instantiate(prefab, GameObjectRoot.Transform).GetComponent<RomanCard>();
                 yield return discoveryCard.Show();
+                isCardShowing = false;
                 
                 RomanGameState gameState = GameManager.Instance.GameState as RomanGameState;
                 yield return new WaitUntil(() => gameState?.curStep == GameStep.HideCard);
@@ -97,7 +114,9 @@ namespace Game.GameType.Roman.ClientSide
             "ShowCard".Log();
             IEnumerator ShowRoutine()
             {
+                isCardShowing = true;
                 yield return card.Show();
+                isCardShowing = false;
                 
                 RomanGameState gameState = GameManager.Instance.GameState as RomanGameState;
                 yield return new WaitUntil(() => gameState?.curStep == GameStep.HideCard);
@@ -135,15 +154,25 @@ namespace Game.GameType.Roman.ClientSide
 
         public void ShowResultPopup()
         {
-            var instance = UIManager.Instance.ShowPopup("Prefabs/Roman/ResultPopup", 9);
-            var resultPopup = instance.GetComponent<ResultPopup>();
-            var gameState = GameManager.Instance.GameState as RomanGameState;
-            
-            resultPopup.RefreshResultText(gameState.curPlayer);
-            resultPopup.Show();
-            
-            resultPopup.button.onClick.AddListener(()=> SceneManager.LoadScene(Define.SceneType.ConnectScene.ToString()));
-            resultPopup.button.onClick.AddListener(()=> resultPopup.button.onClick.RemoveAllListeners());
+            IEnumerator ShowRoutine()
+            {
+                // 카드를 보여 달라는 메시지가 결과보다 늦게 올 수 있어 잠시 기다린 뒤 확인한다
+                yield return new WaitForSeconds(ResultCheckDelaySeconds);
+                yield return new WaitUntil(() => !isCardShowing);
+                yield return new WaitForSeconds(ResultDelaySeconds);
+
+                var instance = UIManager.Instance.ShowPopup("Prefabs/Roman/ResultPopup", 9);
+                var resultPopup = instance.GetComponent<ResultPopup>();
+                var gameState = GameManager.Instance.GameState as RomanGameState;
+                
+                resultPopup.RefreshResultText(gameState.curPlayer);
+                resultPopup.Show();
+                
+                resultPopup.button.onClick.AddListener(()=> SceneManager.LoadScene(Define.SceneType.ConnectScene.ToString()));
+                resultPopup.button.onClick.AddListener(()=> resultPopup.button.onClick.RemoveAllListeners());
+            }
+
+            StartCoroutine(ShowRoutine());
         }
     }
 }

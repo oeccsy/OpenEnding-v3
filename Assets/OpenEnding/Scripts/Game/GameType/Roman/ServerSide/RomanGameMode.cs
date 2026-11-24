@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using Game.GameType.Roman.ClientSide;
+using Game.GameType.Roman.ServerSide.Card;
 using Game.GameType.Roman.ServerSide.CardBase;
 using Game.Manager.GameManage;
 using UnityEngine;
@@ -60,7 +62,7 @@ namespace Game.GameType.Roman.ServerSide
 
         private void InitDeviceOwnCard()
         {
-            var randomNumbers = Utils.GetCombinationInt(1, 6, 6); // TODO : 카드가 늘면 같이 늘린다 (6 = Shower)
+            var randomNumbers = Utils.GetCombinationInt(1, 7, 7); // TODO : 카드가 늘면 같이 늘린다 (7 = PaperPlane)
             Utils.ShuffleList(randomNumbers);
 
             for (int i = 0; i < NetworkManager.Instance.connectedDeviceList.Count; i++)
@@ -156,12 +158,34 @@ namespace Game.GameType.Roman.ServerSide
             
             if(shakenCard is IShakeAbility card) card.ShakeAbility();
             OnCardShaken?.Invoke(cardType);
+
+            // 종이비행기는 덱 대신 다른 디바이스의 카드와 자리를 바꾼다
+            if (shakenCard is PaperPlane && TrySwapWithOtherDevice(shakenCard)) return;
             
             var newCard = cardContainer.ReplaceCard(cardType);
 
             NetworkManager.Instance.ClientRpcCall(newCard.deviceColor, typeof(RomanGameScene), "ReplaceCard", newCard.cardType);
         }
         
+        // 흔든 카드와 필드의 무작위 다른 디바이스 카드를 맞바꾼다. 맞바꿀 카드가 없으면 false
+        private bool TrySwapWithOtherDevice(RomanCard shakenCard)
+        {
+            List<RomanCard> otherCards = cardContainer.GetCards<RomanCard>();
+            otherCards.Remove(shakenCard);
+            if (otherCards.Count == 0) return false;
+
+            RomanCard targetCard = otherCards[Random.Range(0, otherCards.Count)];
+            ColorPalette.ColorName shakerColor = shakenCard.deviceColor;
+            ColorPalette.ColorName targetColor = targetCard.deviceColor;
+            cardContainer.SwapCards(shakenCard.cardType, targetCard.cardType);
+            $"PaperPlane {shakerColor} <-> {targetColor} ({targetCard.cardType})".Log();
+
+            // 흔든 사람은 날아온 카드를 보고, 엎어져 있는 상대 디바이스는 화면 연출 없이 카드만 바뀐다
+            NetworkManager.Instance.ClientRpcCall(shakerColor, typeof(RomanGameScene), "ReplaceCard", targetCard.cardType);
+            NetworkManager.Instance.ClientRpcCall(targetColor, typeof(RomanGameScene), "SwapCardSilently", shakenCard.cardType);
+            return true;
+        }
+
         public void DiscoverCard(CardType cardType)
         {
             $"Discover {cardType}".Log();
