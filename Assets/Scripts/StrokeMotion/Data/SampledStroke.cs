@@ -12,16 +12,18 @@ namespace Oeccsy.StrokeMotion
         private readonly Vector2[] points;
         private readonly float[] cumulativeLengths;
 
-        public SampledStroke(Color color, float width, Vector2[] points, float[] cumulativeLengths)
+        public SampledStroke(Color color, float width, int layer, Vector2[] points, float[] cumulativeLengths)
         {
             Color = color;
             Width = width;
+            Layer = layer;
             this.points = points;
             this.cumulativeLengths = cumulativeLengths;
         }
 
         public Color Color { get; }
         public float Width { get; }
+        public int Layer { get; }
         public IReadOnlyList<Vector2> Points => points;
         public IReadOnlyList<float> CumulativeLengths => cumulativeLengths;
         public float TotalLength => cumulativeLengths[cumulativeLengths.Length - 1];

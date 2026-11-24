@@ -39,7 +39,7 @@ namespace Oeccsy.StrokeMotion
 
             float[] cumulativeLengths = CalculateCumulativeLengths(points);
 
-            return new SampledStroke(stroke.Color, stroke.Width, points.ToArray(), cumulativeLengths);
+            return new SampledStroke(stroke.Color, stroke.Width, stroke.Layer, points.ToArray(), cumulativeLengths);
         }
         
         private Vector2 EvaluateBezier(Curve curve, float t)

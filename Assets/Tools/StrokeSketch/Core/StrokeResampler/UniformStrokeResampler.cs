@@ -34,7 +34,7 @@ namespace Oeccsy.StrokeSketch
                 resampled.Add(PointAtDistance(points, distances, segmentEnd, targetDistance));
             }
 
-            return new RawStroke(stroke.Color, stroke.Width, resampled);
+            return new RawStroke(stroke.Color, stroke.Width, stroke.Layer, resampled);
         }
 
         // 시작점부터 각 점까지의 누적 거리. 마지막 값이 전체 길이다.

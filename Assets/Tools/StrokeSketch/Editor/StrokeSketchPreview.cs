@@ -53,7 +53,7 @@ namespace Oeccsy.StrokeSketch
             List<TrimmedStroke> renderStrokes = new List<TrimmedStroke>();
             foreach (SampledStroke sampledStroke in strokeSampler.Sample(strokes))
             {
-                renderStrokes.Add(new TrimmedStroke(sampledStroke.Color, sampledStroke.Width, sampledStroke.Points.ToArray()));
+                renderStrokes.Add(new TrimmedStroke(sampledStroke.Color, sampledStroke.Width, sampledStroke.Layer, sampledStroke.Points.ToArray()));
             }
 
             finishedStrokeRenderer.BuildMesh(renderStrokes);
@@ -69,7 +69,7 @@ namespace Oeccsy.StrokeSketch
             if (drawingPoints.Count >= 2)
             {
                 Vector2[] positions = drawingPoints.Select(point => point.Position).ToArray();
-                drawingStrokes.Add(new TrimmedStroke(settings.penColor, settings.penWidth, positions));
+                drawingStrokes.Add(new TrimmedStroke(settings.penColor, settings.penWidth, settings.layer, positions));
             }
 
             drawingStrokeRenderer.BuildMesh(drawingStrokes);

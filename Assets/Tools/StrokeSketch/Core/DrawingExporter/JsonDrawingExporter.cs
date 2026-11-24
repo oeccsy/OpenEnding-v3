@@ -48,6 +48,7 @@ namespace Oeccsy.StrokeSketch
         {
             builder.Append("{\"color\": \"").Append(ToHtmlColor(stroke.Color)).Append("\", ");
             builder.Append("\"width\": ").Append(ToNumber(stroke.Width)).Append(", ");
+            builder.Append("\"layer\": ").Append(stroke.Layer).Append(", ");
             builder.Append("\"curves\": [");
 
             for (int i = 0; i < stroke.Curves.Count; i++)

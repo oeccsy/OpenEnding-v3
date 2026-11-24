@@ -11,15 +11,18 @@ namespace Oeccsy.StrokeMotion
     {
         private readonly List<Curve> curves;
 
-        public Stroke(Color color, float width, IEnumerable<Curve> curves)
+        public Stroke(Color color, float width, int layer, IEnumerable<Curve> curves)
         {
             Color = color;
             Width = width;
+            Layer = layer;
             this.curves = new List<Curve>(curves);
         }
 
         public Color Color { get; }
         public float Width { get; }
+        // 겹침 순서. 클수록 위에 그려지고, 같으면 나중 획이 위다. 그려지는 시간 순서와는 따로다.
+        public int Layer { get; }
         public IReadOnlyList<Curve> Curves => curves;
     }
 }

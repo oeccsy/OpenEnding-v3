@@ -31,7 +31,7 @@ namespace Oeccsy.StrokeMotion
                 }                
             }
 
-            return new TrimmedStroke(stroke.Color, stroke.Width, trimmedPoints.ToArray());
+            return new TrimmedStroke(stroke.Color, stroke.Width, stroke.Layer, trimmedPoints.ToArray());
         }
 
         // 목표 길이가 (segmentEndIndex - 1)번 점과 segmentEndIndex번 점 사이에 있을 때, 보간한 위치의 점을 구한다

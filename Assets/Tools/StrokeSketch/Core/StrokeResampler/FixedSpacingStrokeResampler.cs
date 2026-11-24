@@ -37,7 +37,7 @@ namespace Oeccsy.StrokeSketch
 
             EnsureEndPoint(resampled, points[points.Count - 1], targetSpacing);
 
-            return new RawStroke(stroke.Color, stroke.Width, resampled);
+            return new RawStroke(stroke.Color, stroke.Width, stroke.Layer, resampled);
         }
 
         // 끝점까지의 직선거리가 목표 간격의 절반보다 짧으면 마지막 점을 교체해 짧은 조각을 줄인다.

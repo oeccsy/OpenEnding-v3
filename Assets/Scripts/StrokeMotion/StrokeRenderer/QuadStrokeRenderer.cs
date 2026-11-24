@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -35,8 +36,10 @@ namespace Oeccsy.StrokeMotion
         {
             EnsureMesh();
             ClearBuffers();
-            
-            foreach (TrimmedStroke stroke in strokes)
+
+            // 나중에 넣은 사각형이 위에 그려지므로 layer 순으로 넣는다. OrderBy는 안정 정렬이라 같은 layer 안에서는 받은 순서를 지킨다
+            IEnumerable<TrimmedStroke> layeredStrokes = strokes.OrderBy((stroke) => stroke.Layer);
+            foreach (TrimmedStroke stroke in layeredStrokes)
             {
                 for (int i = 0; i + 1 < stroke.Points.Count; i++)
                 {

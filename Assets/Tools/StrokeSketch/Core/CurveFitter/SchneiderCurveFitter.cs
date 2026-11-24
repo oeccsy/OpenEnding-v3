@@ -32,7 +32,7 @@ namespace Oeccsy.StrokeSketch
                 FitCubic(points, first, last, startTangent, endTangent, tolerance * tolerance, curves);
             }
 
-            return new Stroke(stroke.Color, stroke.Width, curves);
+            return new Stroke(stroke.Color, stroke.Width, stroke.Layer, curves);
         }
 
         // 거리의 제곱으로 오차를 비교하며, 허용 거리의 2배 안에서만 보정을 시도한다.

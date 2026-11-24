@@ -22,7 +22,7 @@ namespace Oeccsy.StrokeSketch
                 SmoothSegment(points, smoothed, anchors[i - 1], anchors[i], radius);
             }
 
-            return new RawStroke(stroke.Color, stroke.Width, smoothed);
+            return new RawStroke(stroke.Color, stroke.Width, stroke.Layer, smoothed);
         }
 
         // 움직이지 않을 점 : 획의 양 끝과 모서리. 이웃한 두 고정점 사이가 따로 평균 내는 구간이 된다

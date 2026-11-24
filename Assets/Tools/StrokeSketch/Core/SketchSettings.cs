@@ -17,6 +17,9 @@ namespace Oeccsy.StrokeSketch
         public Color penColor;
         public float penWidth;
 
+        // 겹침 순서. 클수록 위에 그려지고, 같으면 나중 획이 위다. 그려지는 시간 순서와는 따로다.
+        public int layer;
+
         // 목표 간격(그림 좌표 단위). 실제 간격은 구현체에 따라 다르다.
         public float targetSpacing;
 
@@ -35,6 +38,7 @@ namespace Oeccsy.StrokeSketch
             canvasSize = new Vector2(1920f, 1080f),
             penColor = Color.black,
             penWidth = 20f,
+            layer = 0,
             targetSpacing = 4f,
             cornerAngle = 60f,
             cornerSpeedRatio = 0.4f,

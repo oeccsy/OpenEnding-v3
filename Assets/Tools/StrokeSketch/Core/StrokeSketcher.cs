@@ -28,7 +28,7 @@ namespace Oeccsy.StrokeSketch
         // 입력의 점 목록에 지금 펜 설정의 색과 굵기를 입혀 정리한다.
         public void RefineStroke(IReadOnlyList<StrokePoint> points)
         {
-            RawStroke rawStroke = new RawStroke(Settings.penColor, Settings.penWidth, points);
+            RawStroke rawStroke = new RawStroke(Settings.penColor, Settings.penWidth, Settings.layer, points);
 
             RawStroke resampledStroke = strokeResampler.Resample(rawStroke, Settings.targetSpacing);
             IReadOnlyList<int> corners = cornerFinder.FindCorners(resampledStroke, Settings.cornerAngle, Settings.cornerSpeedRatio);

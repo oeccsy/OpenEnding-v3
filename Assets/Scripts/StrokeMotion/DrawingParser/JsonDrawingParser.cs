@@ -69,9 +69,10 @@ namespace Oeccsy.StrokeMotion
             string colorText = colorToken.Value<string>();
             Color color = ParseColor(colorText);
             float width = widthToken.Value<float>();
+            int layer = strokeToken["layer"]?.Value<int>() ?? 0;
             IEnumerable<Curve> curves = curveArray.Select(ParseCurve);
 
-            return new Stroke(color, width, curves);
+            return new Stroke(color, width, layer, curves);
         }
 
         private Color ParseColor(string colorText)
