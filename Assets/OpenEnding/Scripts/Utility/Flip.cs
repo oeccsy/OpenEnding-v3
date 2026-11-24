@@ -8,6 +8,7 @@ namespace Utility
     {
         [SerializeField]
         private Define.DisplayedFace curFace = Define.DisplayedFace.None;
+        public Define.DisplayedFace CurFace => curFace;
         public delegate void FlipHandler();
         public event FlipHandler OnFlipToHead;
         public event FlipHandler OnFlipToTail;

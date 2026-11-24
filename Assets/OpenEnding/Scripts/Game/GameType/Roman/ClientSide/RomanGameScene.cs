@@ -85,8 +85,8 @@ namespace Game.GameType.Roman.ClientSide
                 RomanGameState gameState = GameManager.Instance.GameState as RomanGameState;
                 yield return new WaitUntil(() => gameState?.curStep == GameStep.HideCard);
                 
-                GameManager.Instance.PlayerController.flip.OnNextTail += ()=> StartCoroutine(discoveryCard.Hide());
-                GameManager.Instance.PlayerController.flip.OnNextTail += ()=> StartCoroutine(discoveryCard.cardInfoUI.Hide());
+                // 발견한 카드는 이번 턴에만 보여 주므로 숨긴 뒤 지운다. 남겨 두면 다음 턴의 카드와 겹친다
+                HideOnTail(discoveryCard, true);
             }
             
             StartCoroutine(DiscoverRoutine());
@@ -102,11 +102,35 @@ namespace Game.GameType.Roman.ClientSide
                 RomanGameState gameState = GameManager.Instance.GameState as RomanGameState;
                 yield return new WaitUntil(() => gameState?.curStep == GameStep.HideCard);
                 
-                GameManager.Instance.PlayerController.flip.OnNextTail += ()=> StartCoroutine(card.Hide());
-                GameManager.Instance.PlayerController.flip.OnNextTail += ()=> StartCoroutine(card.cardInfoUI.Hide());
+                HideOnTail(card, false);
             }
 
             StartCoroutine(ShowRoutine());
+        }
+
+        // 이미 뒷면이면 바로 숨기고, 아니면 다음에 뒷면으로 뒤집을 때 숨긴다.
+        // 확인 시간 안에 먼저 엎으면 뒷면으로 바뀌는 순간이 다시 오지 않아 카드가 계속 남기 때문이다.
+        private void HideOnTail(RomanCard target, bool destroyAfterHide)
+        {
+            Flip flip = GameManager.Instance.PlayerController.flip;
+            if (flip.CurFace == Define.DisplayedFace.Tail)
+            {
+                StartCoroutine(HideRoutine(target, destroyAfterHide));
+                return;
+            }
+
+            flip.OnNextTail += () => StartCoroutine(HideRoutine(target, destroyAfterHide));
+        }
+
+        private IEnumerator HideRoutine(RomanCard target, bool destroyAfterHide)
+        {
+            if (target == null) yield break;
+
+            Coroutine infoHide = StartCoroutine(target.cardInfoUI.Hide());
+            yield return target.Hide();
+            yield return infoHide;
+
+            if (destroyAfterHide) Destroy(target.gameObject);
         }
 
         public void ShowResultPopup()

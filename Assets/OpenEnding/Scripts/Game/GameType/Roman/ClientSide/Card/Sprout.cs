@@ -64,7 +64,8 @@ namespace Game.GameType.Roman.ClientSide.Card
         
         private Sequence CreateShowSequence()
         {
-            Sequence mainSequence = DOTween.Sequence().SetAutoKill(false);
+            // 카드가 지워지면 애니메이션도 함께 끝낸다. 자동으로 지우지 않는 Sequence라 그대로 두면 지워진 오브젝트를 건드린다
+            Sequence mainSequence = DOTween.Sequence().SetAutoKill(false).SetLink(gameObject);
             
             Transform circleATransform = _circleA.transform;
             Vector3 circleAEndPos = circleATransform.position;
@@ -135,13 +136,16 @@ namespace Game.GameType.Roman.ClientSide.Card
         
         public override IEnumerator Hide()
         {
+            // 등장 애니메이션이 아직 진행 중이면 멈춘다. 그대로 두면 숨긴 뒤에 다시 보인다
+            _showPolygonSequence?.Pause();
+
             Sequence sequence = null;
             
             foreach (var polygon in _polygons)
             {
                 Transform polygonTransform = polygon.transform;
                 
-                sequence = DOTween.Sequence();
+                sequence = DOTween.Sequence().SetLink(gameObject);
 
                 sequence
                     .Append(polygon.meshRenderer.material.DOFade(0, 0.2f))

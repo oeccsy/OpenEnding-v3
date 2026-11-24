@@ -29,6 +29,8 @@ namespace Utility
             
             if (value > threshold)
             {
+                // 흔들기 기준값을 맞추기 위한 기록. 기준을 정하면 지운다
+                $"Shake detected : {value:F2}g".Log();
                 OnEveryShake?.Invoke();
                 OnNextShake?.Invoke();
                 OnNextShake = null;
