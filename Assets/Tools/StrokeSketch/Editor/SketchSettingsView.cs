@@ -38,7 +38,7 @@ namespace Oeccsy.StrokeSketch
 
             VisualElement penSection = AddSection("펜");
             AddField(penSection, new ColorField("색"), () => settings.penColor, (value) => settings.penColor = value);
-            AddField(penSection, new Slider("두께", 0.5f, 100f) { showInputField = true }, () => settings.penWidth, (value) => settings.penWidth = value);
+            AddField(penSection, new Slider("두께", 0.5f, 500f) { showInputField = true }, () => settings.penWidth, (value) => settings.penWidth = value);
             AddField(penSection, new IntegerField("레이어"), () => settings.layer, (value) => settings.layer = value);
 
             VisualElement refineSection = AddSection("다듬기");
