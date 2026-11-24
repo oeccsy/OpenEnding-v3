@@ -20,6 +20,7 @@ namespace Game.GameType.Roman.ServerSide
             availableCards.Add(CardType.Artwork, new Artwork());
             availableCards.Add(CardType.Sprout, new Sprout());
             availableCards.Add(CardType.RoleModel, new RoleModel());
+            availableCards.Add(CardType.Shower, new Shower());
         }
 
         public void UseCard(CardType cardType, ColorPalette.ColorName deviceColor)

@@ -27,9 +27,10 @@ namespace Game.GameType.Roman.ServerSide.Card
             _growthCount++;
         }
 
+        // 소나기가 부른다. 0 아래로는 내려가지 않는다
         public void Regress()
         {
-            _growthCount--;
+            if (_growthCount > 0) _growthCount--;
         }
     }
 }

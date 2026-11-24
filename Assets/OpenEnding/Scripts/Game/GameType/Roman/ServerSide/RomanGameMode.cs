@@ -60,7 +60,7 @@ namespace Game.GameType.Roman.ServerSide
 
         private void InitDeviceOwnCard()
         {
-            var randomNumbers = Utils.GetCombinationInt(1, 5, 5); // TODO
+            var randomNumbers = Utils.GetCombinationInt(1, 6, 6); // TODO : 카드가 늘면 같이 늘린다 (6 = Shower)
             Utils.ShuffleList(randomNumbers);
 
             for (int i = 0; i < NetworkManager.Instance.connectedDeviceList.Count; i++)

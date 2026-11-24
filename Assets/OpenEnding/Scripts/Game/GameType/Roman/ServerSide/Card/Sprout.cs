@@ -32,6 +32,12 @@ namespace Game.GameType.Roman.ServerSide.Card
             }
         }
 
+        // 소나기가 부른다. 뒤집힌 횟수를 하나 줄이고, 0 아래로는 내려가지 않는다. 처음 뒤집은 사람은 그대로 둔다
+        public void Regress()
+        {
+            if (_flipCount > 0) _flipCount--;
+        }
+
         public override void OnEnterField() {}
         public override void OnExitField() {}
     }

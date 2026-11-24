@@ -60,7 +60,7 @@ namespace Game.GameType.Roman
         Artwork,
         Sprout,
         RoleModel,
-        F,
+        Shower,
         G,
         H,
         I,
