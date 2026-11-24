@@ -1,19 +1,19 @@
 fileFormatVersion: 2
 guid: 43f1786d73716d04c982a6ad68a85e4d
 ModelImporter:
-  serializedVersion: 22200
+  serializedVersion: 24200
   internalIDToNameTable: []
   externalObjects:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Device
-    second: {fileID: 2100000, guid: 828d10c0e34adcd4d832a2c6b116c292, type: 2}
+    second: {fileID: 2100000, guid: 6cd4b55bea83cfe4fb3119e815d23fef, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Display
-    second: {fileID: 2100000, guid: d6761e87bda333a46a21ba14f8c22d43, type: 2}
+    second: {fileID: 2100000, guid: 17205e75f40ba7b4da7486268136f74d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -26,8 +26,6 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -68,6 +66,9 @@ ModelImporter:
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
     optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
