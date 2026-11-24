@@ -75,6 +75,12 @@ public class AndroidConnection : Singleton<AndroidConnection>
     _centralInstance.Call("startScanning", deviceName);
   }
 
+  // 연결된 모든 기기에 MTU를 요청한다. 플러그인이 512로 제한한다.
+  public void RequestMtu(int mtu)
+  {
+    _centralInstance.Call("requestMtu", mtu);
+  }
+
   public void StopScanning()
   {
     _centralInstance.Call("stopScanning");
